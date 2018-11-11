@@ -105,20 +105,4 @@ public class HacSharedExcutorCustom implements HacExecutorCustom {
             throw new RuntimeException(e);
         }
     }
-
-    static {
-        Runtime
-                .getRuntime()
-                .addShutdownHook(new Thread(new Runnable() {
-                    public void run() {
-                        if (hac != null && hac.isRunning()) {
-                            HttpAsyncClientUtils.closeQuietly(hac);
-                        }
-                        if (service != null && !service.isShutdown()) {
-
-                            service.shutdown();
-                        }
-                    }
-                }));
-    }
 }
