@@ -2,7 +2,6 @@ package org.apache.http.client.fluent;
 
 import org.slf4j.Logger;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
 import java.net.URI;
@@ -61,7 +60,7 @@ public class HacVirtualServer {
             if (ex instanceof ConnectException
                     || ex instanceof UnknownHostException) {
                 remove(watched);
-                LOGGER.debug(" remove failed server: " + watched.getBasePath());
+                LOGGER.debug(" remove failed server: " + watched.getAddress());
             }
         }
     }
@@ -91,7 +90,7 @@ public class HacVirtualServer {
         private URI expand(HacRealServer realServer) {
 
 
-            StringBuilder sb = new StringBuilder(realServer.getBasePath()).append(path);
+            StringBuilder sb = new StringBuilder(realServer.resolve(path));
             char c = '?';
             for (Map.Entry<String, String> entry : queryParams.entrySet()) {
                 sb
@@ -137,9 +136,5 @@ public class HacVirtualServer {
                     .Post(hacExecutor, expand(select))
                     .addListener(new ServerFailedListener(select));
         }
-    }
-
-    public static void main(String[] args) throws IOException {
-
     }
 }
