@@ -32,7 +32,7 @@ public class HacVirtualServer {
         refreshRealServers();
     }
 
-    public void refreshRealServers() {
+    public synchronized void refreshRealServers() {
         List<HacRealServer> realServers = discoveryClient.seek(name);
         if (realServers == null || realServers.isEmpty()) {
             return;
@@ -40,7 +40,7 @@ public class HacVirtualServer {
         this.realRealServers = new ArrayList<HacRealServer>(realServers);
     }
 
-    public void remove(HacRealServer realServer) {
+    public synchronized void remove(HacRealServer realServer) {
         List<HacRealServer> copy = new ArrayList<HacRealServer>(realRealServers);
         copy.remove(realServer);
         this.realRealServers = copy;
