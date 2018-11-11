@@ -18,13 +18,17 @@ public class HacVirtualServerKeeper {
     static {
         Runtime
                 .getRuntime()
-                .addShutdownHook(new Thread(new Runnable() {
-                    public void run() {
-                        for (HacCloseable closeable : closeables) {
-                            tryClose(closeable);
-                        }
-                    }
-                }));
+                .addShutdownHook(new Thread(
+                        new Runnable() {
+                            public void run() {
+                                Thread
+                                        .currentThread()
+                                        .setName("HacShutdownHook");
+                                for (HacCloseable closeable : closeables) {
+                                    tryClose(closeable);
+                                }
+                            }
+                        }));
     }
 
     public synchronized static HacVirtualServer create(final String name,
