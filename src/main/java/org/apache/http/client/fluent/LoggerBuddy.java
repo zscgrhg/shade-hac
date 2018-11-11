@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 class LoggerBuddy {
     public static final LoggerContext LOGGER_CONTEXT = createFromClasspathResource();
     public static final String CONFIG_NAME = "hac.xml";
+    public static final String CONFIG_NAME_DEBUG = "hac-debug.xml";
 
     public static Logger of(Class<?> clazz) {
         return LOGGER_CONTEXT.getLogger(clazz);
@@ -18,14 +19,31 @@ class LoggerBuddy {
         LoggerContext context = new LoggerContext();
         try {
             JoranConfigurator configurator = new JoranConfigurator();
-
+            String filename = "true".equalsIgnoreCase(getSystemProperty("hac.debug"))
+                    ? CONFIG_NAME_DEBUG : CONFIG_NAME;
             configurator.setContext(context);
             configurator.doConfigure(LoggerBuddy.class
                     .getClassLoader()
-                    .getResourceAsStream(CONFIG_NAME));
+                    .getResourceAsStream(filename));
         } catch (JoranException je) {
 
         }
         return context;
+    }
+
+    private static String getSystemProperty(String name) {
+        try {
+            return trim(System.getProperty(name));
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private static String trim(String str) {
+        if (str != null) {
+            return str.trim();
+        } else {
+            return null;
+        }
     }
 }

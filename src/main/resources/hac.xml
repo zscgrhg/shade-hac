@@ -1,11 +1,11 @@
 <configuration>
-    <contextName>hac</contextName>
+    <contextName>hac-error</contextName>
     <shutdownHook/>
-    <appender name="RFILE" class="shade.hac.ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${user.dir}/hac.log</file>
+    <appender name="FILE" class="shade.hac.ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${user.dir}/hac-error.log</file>
         <rollingPolicy class="shade.hac.ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover -->
-            <fileNamePattern>hac.%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+            <fileNamePattern>hac-error.%d{yyyy-MM-dd}.log.zip</fileNamePattern>
 
             <maxHistory>30</maxHistory>
             <totalSizeCap>500MB</totalSizeCap>
@@ -14,13 +14,6 @@
 
         <encoder>
             <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
-        </encoder>
-    </appender>
-    <appender name="FILE" class="shade.hac.ch.qos.logback.core.FileAppender">
-        <file>${user.dir}/hac.log</file>
-
-        <encoder>
-            <pattern>%contextName %date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -33,11 +26,11 @@
     </appender>
 
     <appender name="ASYNC" class="shade.hac.ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="RFILE"/>
+        <appender-ref ref="FILE"/>
     </appender>
 
     <!--<logger name="com.example.hc" level="off"/>-->
-    <root level="debug">
+    <root level="ERROR">
         <appender-ref ref="ASYNC"/>
         <appender-ref ref="STDOUT"/>
     </root>

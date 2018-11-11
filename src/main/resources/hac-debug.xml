@@ -1,11 +1,19 @@
 <configuration>
-    <contextName>HAC</contextName>
+    <contextName>hac-trace</contextName>
     <shutdownHook/>
-    <appender name="FILE" class="shade.hac.ch.qos.logback.core.FileAppender">
-        <file>${user.dir}/mc.log</file>
+    <appender name="FILE" class="shade.hac.ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${user.dir}/hac-trace.log</file>
+        <rollingPolicy class="shade.hac.ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>hac-trace.%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>500MB</totalSizeCap>
+
+        </rollingPolicy>
 
         <encoder>
-            <pattern>[%contextName] %date %level [%thread] %logger{10} [%file:%line] %msg%n</pattern>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg%n</pattern>
         </encoder>
     </appender>
 
@@ -13,12 +21,17 @@
         <!-- encoders are assigned the type
              ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
         <encoder>
-            <pattern>[%contextName] %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            <pattern>%contextName %d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
     </appender>
-    <!--<logger name="com.example.hc" level="off"/>-->
-    <root level="debug">
+
+    <appender name="ASYNC" class="shade.hac.ch.qos.logback.classic.AsyncAppender">
         <appender-ref ref="FILE"/>
+    </appender>
+
+    <!--<logger name="com.example.hc" level="off"/>-->
+    <root level="TRACE">
+        <appender-ref ref="ASYNC"/>
         <appender-ref ref="STDOUT"/>
     </root>
 </configuration>
