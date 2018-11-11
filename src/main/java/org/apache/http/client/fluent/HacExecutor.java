@@ -1,8 +1,12 @@
 package org.apache.http.client.fluent;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.methods.HttpUriRequest;
+import org.apache.http.concurrent.FutureCallback;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 public class HacExecutor {
     private final CloseableHttpAsyncClient hac;
@@ -14,8 +18,10 @@ public class HacExecutor {
         EXECUTOR_SERVICE = executor_service;
     }
 
-    public CloseableHttpAsyncClient getHac() {
-        return hac;
+    public Future<HttpResponse> execute(
+            final HttpUriRequest request,
+            final FutureCallback<HttpResponse> callback) {
+        return hac.execute(request, callback);
     }
 
 

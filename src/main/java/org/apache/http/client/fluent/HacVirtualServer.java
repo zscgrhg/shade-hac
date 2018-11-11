@@ -12,15 +12,15 @@ import java.util.List;
 import java.util.Map;
 
 
-public class VirtualServer {
+public class HacVirtualServer {
     private final String name;
-    private final DiscoveryClient discoveryClient;
-    private final LoadBlancer loadBlancer;
+    private final HacDiscoveryClient discoveryClient;
+    private final HacLoadBlancer loadBlancer;
     private final HacExecutor hacExecutor;
 
-    private volatile List<RealServer> realRealServers = new ArrayList<RealServer>();
+    private volatile List<HacRealServer> realRealServers = new ArrayList<HacRealServer>();
 
-    VirtualServer(String name, DiscoveryClient discoveryClient, LoadBlancer loadBlancer, HacExecutor hacExecutor) {
+    HacVirtualServer(String name, HacDiscoveryClient discoveryClient, HacLoadBlancer loadBlancer, HacExecutor hacExecutor) {
         this.name = name;
         this.discoveryClient = discoveryClient;
         this.loadBlancer = loadBlancer;
@@ -32,24 +32,24 @@ public class VirtualServer {
     }
 
     public void refreshRealServers() {
-        List<RealServer> realServers = discoveryClient.seek(name);
+        List<HacRealServer> realServers = discoveryClient.seek(name);
         if (realServers == null || realServers.isEmpty()) {
             return;
         }
-        this.realRealServers = new ArrayList<RealServer>(realServers);
+        this.realRealServers = new ArrayList<HacRealServer>(realServers);
     }
 
-    public void remove(RealServer realServer) {
-        List<RealServer> copy = new ArrayList<RealServer>(realRealServers);
+    public void remove(HacRealServer realServer) {
+        List<HacRealServer> copy = new ArrayList<HacRealServer>(realRealServers);
         copy.remove(realServer);
         this.realRealServers = copy;
     }
 
 
-    public class ServerFailedListener extends HcListener implements SyncHcListener {
-        private final RealServer watched;
+    public class ServerFailedListener extends HacListener implements HacSyncListener {
+        private final HacRealServer watched;
 
-        public ServerFailedListener(RealServer watched) {
+        public ServerFailedListener(HacRealServer watched) {
             this.watched = watched;
         }
 
@@ -85,11 +85,11 @@ public class VirtualServer {
         }
 
         private URI expand() {
-            List<RealServer> copy = realRealServers;
+            List<HacRealServer> copy = realRealServers;
             if (copy == null || copy.isEmpty()) {
                 throw new RuntimeException("server of " + name + " is down");
             }
-            RealServer realServer = loadBlancer.select(copy);
+            HacRealServer realServer = loadBlancer.select(copy);
             StringBuilder sb = new StringBuilder(realServer.getBasePath()).append(path);
             char c = '?';
             for (Map.Entry<String, String> entry : queryParams.entrySet()) {
@@ -114,12 +114,12 @@ public class VirtualServer {
             }
         }
 
-        public HcRequest Get() {
-            return HcRequest.Get(hacExecutor, expand());
+        public HacRequest Get() {
+            return HacRequest.Get(hacExecutor, expand());
         }
 
-        public HcRequest Post() {
-            return HcRequest.Post(hacExecutor, expand());
+        public HacRequest Post() {
+            return HacRequest.Post(hacExecutor, expand());
         }
     }
 

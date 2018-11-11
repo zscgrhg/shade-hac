@@ -20,7 +20,7 @@ import java.nio.charset.CodingErrorAction;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class SharedHacCustom implements HacExecutorCustom {
+public class HacSharedExcutorCustom implements HacExecutorCustom {
     public static volatile CloseableHttpAsyncClient hac;
     public static volatile ExecutorService service;
 

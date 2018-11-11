@@ -5,7 +5,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import org.slf4j.Logger;
 
-class LoggerBuddy {
+class HacLoggerBuddy {
     public static final LoggerContext LOGGER_CONTEXT = createFromClasspathResource();
     public static final String CONFIG_NAME = "hac.xml";
     public static final String CONFIG_NAME_DEBUG = "hac-debug.xml";
@@ -22,7 +22,7 @@ class LoggerBuddy {
             String filename = "true".equalsIgnoreCase(getSystemProperty("hac.debug"))
                     ? CONFIG_NAME_DEBUG : CONFIG_NAME;
             configurator.setContext(context);
-            configurator.doConfigure(LoggerBuddy.class
+            configurator.doConfigure(HacLoggerBuddy.class
                     .getClassLoader()
                     .getResourceAsStream(filename));
         } catch (JoranException je) {

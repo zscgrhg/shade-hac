@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 import java.util.concurrent.atomic.AtomicLong;
 
 @EqualsAndHashCode(of = {"host", "port"})
-public class RealServer {
+public class HacRealServer {
     public static final AtomicLong COUNTER = new AtomicLong(0);
     private final long mark = COUNTER.incrementAndGet();
     private final String host;
@@ -14,7 +14,7 @@ public class RealServer {
     private final String healthEndpoint;
     private final boolean enableSSL;
 
-    public RealServer(String host, int port, String ctxPath, String healthEndpoint, boolean enableSSL) {
+    public HacRealServer(String host, int port, String ctxPath, String healthEndpoint, boolean enableSSL) {
         this.host = host;
         this.port = port;
         this.ctxPath = ctxPath;

@@ -10,21 +10,33 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 
-public class VirtualServerKeeper {
-    public static final Logger LOGGER = LoggerBuddy.of(VirtualServerKeeper.class);
-    private static final Map<String, VirtualServer> SERVERS = new ConcurrentHashMap<String, VirtualServer>();
-    private static final Set<CloseableObject> closeables = new HashSet<CloseableObject>();
+public class HacVirtualServerKeeper {
+    public static final Logger LOGGER = HacLoggerBuddy.of(HacVirtualServerKeeper.class);
+    private static final Map<String, HacVirtualServer> SERVERS = new ConcurrentHashMap<String, HacVirtualServer>();
+    private static final Set<HacCloseable> closeables = new HashSet<HacCloseable>();
 
-    public synchronized static VirtualServer create(final String name,
-                                                    DiscoveryClient discoveryClient,
-                                                    LoadBlancer loadBlancer,
-                                                    HacExecutorCustom haec) {
+    static {
+        Runtime
+                .getRuntime()
+                .addShutdownHook(new Thread(new Runnable() {
+                    public void run() {
+                        for (HacCloseable closeable : closeables) {
+                            tryClose(closeable);
+                        }
+                    }
+                }));
+    }
+
+    public synchronized static HacVirtualServer create(final String name,
+                                                       HacDiscoveryClient discoveryClient,
+                                                       HacLoadBlancer loadBlancer,
+                                                       HacExecutorCustom haec) {
         if (SERVERS.containsKey(name)) {
             return SERVERS.get(name);
         } else {
             final CloseableHttpAsyncClient hac = haec.createHac();
             final ExecutorService executorService = haec.createExecutorService();
-            closeables.add(new CloseableObject() {
+            closeables.add(new HacCloseable() {
                 public boolean isOpen() {
                     return hac.isRunning();
                 }
@@ -34,7 +46,7 @@ public class VirtualServerKeeper {
                     hac.close();
                 }
             });
-            closeables.add(new CloseableObject() {
+            closeables.add(new HacCloseable() {
                 public boolean isOpen() {
                     return !executorService.isShutdown();
                 }
@@ -44,7 +56,7 @@ public class VirtualServerKeeper {
                     executorService.shutdown();
                 }
             });
-            VirtualServer created = new VirtualServer(name, discoveryClient,
+            HacVirtualServer created = new HacVirtualServer(name, discoveryClient,
                     loadBlancer,
                     new HacExecutor(hac, executorService));
             SERVERS.put(name, created);
@@ -52,13 +64,13 @@ public class VirtualServerKeeper {
         }
     }
 
-    public synchronized static VirtualServer create(String name, DiscoveryClient discoveryClient) {
+    public synchronized static HacVirtualServer create(String name, HacDiscoveryClient discoveryClient) {
         return create(name, discoveryClient,
-                new SimpleLB(),
-                new SharedHacCustom());
+                new HacSimpleLB(),
+                new HacSharedExcutorCustom());
     }
 
-    private static void tryClose(CloseableObject closeable) {
+    private static void tryClose(HacCloseable closeable) {
         if (closeable.isOpen()) {
             try {
                 closeable.close();
@@ -66,18 +78,6 @@ public class VirtualServerKeeper {
 
             }
         }
-    }
-
-    static {
-        Runtime
-                .getRuntime()
-                .addShutdownHook(new Thread(new Runnable() {
-                    public void run() {
-                        for (CloseableObject closeable : closeables) {
-                            tryClose(closeable);
-                        }
-                    }
-                }));
     }
 
 

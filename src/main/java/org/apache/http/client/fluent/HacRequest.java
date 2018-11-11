@@ -14,33 +14,33 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Future;
 
-public class HcRequest extends Request {
-    final static Logger LOGGER = LoggerBuddy.of(HcRequest.class);
+public class HacRequest extends Request {
+    final static Logger LOGGER = HacLoggerBuddy.of(HacRequest.class);
     private final InternalHttpRequest internalHttpRequest;
-    private final HcListenerChain chain = new HcListenerChain();
+    private final HacListenerChain chain = new HacListenerChain();
     private final HacExecutor hacExecutor;
 
-    HcRequest(HacExecutor hacExecutor, InternalHttpRequest request) {
+    HacRequest(HacExecutor hacExecutor, InternalHttpRequest request) {
         super(request);
         this.hacExecutor = hacExecutor;
         this.internalHttpRequest = request;
     }
 
-    public static HcRequest Get(HacExecutor hacExecutor, URI uri) {
-        return new HcRequest(hacExecutor, new InternalHttpRequest("GET", uri));
+    public static HacRequest Get(HacExecutor hacExecutor, URI uri) {
+        return new HacRequest(hacExecutor, new InternalHttpRequest("GET", uri));
     }
 
-    public static HcRequest Get(HacExecutor hacExecutor, String uri) {
-        return new HcRequest(hacExecutor, new InternalHttpRequest("GET", URI.create(uri)));
+    public static HacRequest Get(HacExecutor hacExecutor, String uri) {
+        return new HacRequest(hacExecutor, new InternalHttpRequest("GET", URI.create(uri)));
     }
 
 
-    public static HcRequest Post(HacExecutor hacExecutor, URI uri) {
-        return new HcRequest(hacExecutor, new InternalEntityEnclosingHttpRequest("POST", uri));
+    public static HacRequest Post(HacExecutor hacExecutor, URI uri) {
+        return new HacRequest(hacExecutor, new InternalEntityEnclosingHttpRequest("POST", uri));
     }
 
-    public static HcRequest Post(HacExecutor hacExecutor, String uri) {
-        return new HcRequest(hacExecutor, new InternalEntityEnclosingHttpRequest("POST", URI.create(uri)));
+    public static HacRequest Post(HacExecutor hacExecutor, String uri) {
+        return new HacRequest(hacExecutor, new InternalEntityEnclosingHttpRequest("POST", URI.create(uri)));
     }
 
     public Future<HttpResponse> aexec() {
@@ -48,13 +48,12 @@ public class HcRequest extends Request {
                 .getURI()
                 .toString());
         Future<HttpResponse> execute = hacExecutor
-                .getHac()
                 .execute(internalHttpRequest, chain);
         return execute;
     }
 
-    public HcRequest addListener(FutureCallback<HttpResponse> listener) {
-        if (listener instanceof SyncHcListener) {
+    public HacRequest addListener(FutureCallback<HttpResponse> listener) {
+        if (listener instanceof HacSyncListener) {
             chain.addSync(listener);
         } else {
             chain.addAsync(listener);
@@ -64,210 +63,210 @@ public class HcRequest extends Request {
 
 
     @Override
-    public HcRequest addHeader(Header header) {
+    public HacRequest addHeader(Header header) {
         super.addHeader(header);
         return this;
     }
 
     @Override
-    public HcRequest setHeader(Header header) {
+    public HacRequest setHeader(Header header) {
         super.setHeader(header);
         return this;
     }
 
     @Override
-    public HcRequest addHeader(String name, String value) {
+    public HacRequest addHeader(String name, String value) {
         super.addHeader(name, value);
         return this;
     }
 
     @Override
-    public HcRequest setHeader(String name, String value) {
+    public HacRequest setHeader(String name, String value) {
         super.setHeader(name, value);
         return this;
     }
 
     @Override
-    public HcRequest removeHeader(Header header) {
+    public HacRequest removeHeader(Header header) {
         super.removeHeader(header);
         return this;
     }
 
     @Override
-    public HcRequest removeHeaders(String name) {
+    public HacRequest removeHeaders(String name) {
         super.removeHeaders(name);
         return this;
     }
 
     @Override
-    public HcRequest setHeaders(Header... headers) {
+    public HacRequest setHeaders(Header... headers) {
         super.setHeaders(headers);
         return this;
     }
 
     @Override
-    public HcRequest setCacheControl(String cacheControl) {
+    public HacRequest setCacheControl(String cacheControl) {
         super.setCacheControl(cacheControl);
         return this;
     }
 
     @Override
-    public HcRequest setDate(Date date) {
+    public HacRequest setDate(Date date) {
         super.setDate(date);
         return this;
     }
 
     @Override
-    public HcRequest setIfModifiedSince(Date date) {
+    public HacRequest setIfModifiedSince(Date date) {
         super.setIfModifiedSince(date);
         return this;
     }
 
     @Override
-    public HcRequest setIfUnmodifiedSince(Date date) {
+    public HacRequest setIfUnmodifiedSince(Date date) {
         super.setIfUnmodifiedSince(date);
         return this;
     }
 
     @Override
-    public HcRequest config(String param, Object object) {
+    public HacRequest config(String param, Object object) {
         super.config(param, object);
         return this;
     }
 
     @Override
-    public HcRequest removeConfig(String param) {
+    public HacRequest removeConfig(String param) {
         super.removeConfig(param);
         return this;
     }
 
     @Override
-    public HcRequest version(HttpVersion version) {
+    public HacRequest version(HttpVersion version) {
         super.version(version);
         return this;
     }
 
     @Override
-    public HcRequest elementCharset(String charset) {
+    public HacRequest elementCharset(String charset) {
         super.elementCharset(charset);
         return this;
     }
 
     @Override
-    public HcRequest useExpectContinue() {
+    public HacRequest useExpectContinue() {
         super.useExpectContinue();
         return this;
     }
 
     @Override
-    public HcRequest userAgent(String agent) {
+    public HacRequest userAgent(String agent) {
         super.userAgent(agent);
         return this;
     }
 
     @Override
-    public HcRequest socketTimeout(int timeout) {
+    public HacRequest socketTimeout(int timeout) {
         super.socketTimeout(timeout);
         return this;
     }
 
     @Override
-    public HcRequest connectTimeout(int timeout) {
+    public HacRequest connectTimeout(int timeout) {
         super.connectTimeout(timeout);
         return this;
     }
 
     @Override
-    public HcRequest staleConnectionCheck(boolean b) {
+    public HacRequest staleConnectionCheck(boolean b) {
         super.staleConnectionCheck(b);
         return this;
     }
 
     @Override
-    public HcRequest viaProxy(HttpHost proxy) {
+    public HacRequest viaProxy(HttpHost proxy) {
         super.viaProxy(proxy);
         return this;
     }
 
     @Override
-    public HcRequest viaProxy(String proxy) {
+    public HacRequest viaProxy(String proxy) {
         super.viaProxy(proxy);
         return this;
     }
 
     @Override
-    public HcRequest body(HttpEntity entity) {
+    public HacRequest body(HttpEntity entity) {
         super.body(entity);
         return this;
     }
 
     @Override
-    public HcRequest bodyForm(Iterable<? extends NameValuePair> formParams, Charset charset) {
+    public HacRequest bodyForm(Iterable<? extends NameValuePair> formParams, Charset charset) {
         super.bodyForm(formParams, charset);
         return this;
     }
 
     @Override
-    public HcRequest bodyForm(Iterable<? extends NameValuePair> formParams) {
+    public HacRequest bodyForm(Iterable<? extends NameValuePair> formParams) {
         super.bodyForm(formParams);
         return this;
     }
 
     @Override
-    public HcRequest bodyForm(NameValuePair... formParams) {
+    public HacRequest bodyForm(NameValuePair... formParams) {
         super.bodyForm(formParams);
         return this;
     }
 
     @Override
-    public HcRequest bodyString(String s, ContentType contentType) {
+    public HacRequest bodyString(String s, ContentType contentType) {
         super.bodyString(s, contentType);
         return this;
     }
 
     @Override
-    public HcRequest bodyFile(File file, ContentType contentType) {
+    public HacRequest bodyFile(File file, ContentType contentType) {
         super.bodyFile(file, contentType);
         return this;
     }
 
     @Override
-    public HcRequest bodyByteArray(byte[] b) {
+    public HacRequest bodyByteArray(byte[] b) {
         super.bodyByteArray(b);
         return this;
     }
 
     @Override
-    public HcRequest bodyByteArray(byte[] b, ContentType contentType) {
+    public HacRequest bodyByteArray(byte[] b, ContentType contentType) {
         super.bodyByteArray(b, contentType);
         return this;
     }
 
     @Override
-    public HcRequest bodyByteArray(byte[] b, int off, int len) {
+    public HacRequest bodyByteArray(byte[] b, int off, int len) {
         super.bodyByteArray(b, off, len);
         return this;
     }
 
     @Override
-    public HcRequest bodyByteArray(byte[] b, int off, int len, ContentType contentType) {
+    public HacRequest bodyByteArray(byte[] b, int off, int len, ContentType contentType) {
         super.bodyByteArray(b, off, len, contentType);
         return this;
     }
 
     @Override
-    public HcRequest bodyStream(InputStream instream) {
+    public HacRequest bodyStream(InputStream instream) {
         super.bodyStream(instream);
         return this;
     }
 
     @Override
-    public HcRequest bodyStream(InputStream instream, ContentType contentType) {
+    public HacRequest bodyStream(InputStream instream, ContentType contentType) {
         super.bodyStream(instream, contentType);
         return this;
     }
 
-    private class HcListenerChain extends HcListener {
+    private class HacListenerChain extends HacListener {
         private final List<FutureCallback<HttpResponse>> syncTasks = new ArrayList<FutureCallback<HttpResponse>>();
         private final List<FutureCallback<HttpResponse>> asyncTasks = new ArrayList<FutureCallback<HttpResponse>>();
 
