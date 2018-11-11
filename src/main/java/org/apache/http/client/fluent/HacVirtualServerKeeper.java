@@ -42,7 +42,7 @@ public class HacVirtualServerKeeper {
                 }
 
                 public void close() throws IOException {
-                    LOGGER.debug("close hac of " + name);
+                    LOGGER.debug("close hac of server[" + name + "]");
                     hac.close();
                 }
             });
@@ -52,7 +52,7 @@ public class HacVirtualServerKeeper {
                 }
 
                 public void close() throws IOException {
-                    LOGGER.debug("close executor of " + name);
+                    LOGGER.debug("close executor of server[" + name + "]");
                     executorService.shutdown();
                 }
             });
