@@ -96,8 +96,8 @@ public class HacSharedExcutorCustom implements HacExecutorCustom {
                 .setIoThreadCount(Runtime
                         .getRuntime()
                         .availableProcessors())
-                .setConnectTimeout(30000)
-                .setSoTimeout(30000)
+                .setConnectTimeout(3000)
+                .setSoTimeout(60000)
                 .build();
         try {
             return new DefaultConnectingIOReactor(ioReactorConfig);

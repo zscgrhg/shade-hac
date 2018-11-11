@@ -44,11 +44,8 @@ public class HacRequest extends Request {
     }
 
     public Future<HttpResponse> aexec() {
-        LOGGER.debug(internalHttpRequest
-                .getURI()
-                .toString());
         Future<HttpResponse> execute = hacExecutor
-                .execute(internalHttpRequest, chain);
+                .execute(internalHttpRequest, new HacTimer(chain));
         return execute;
     }
 
@@ -322,5 +319,54 @@ public class HacRequest extends Request {
             }
         }
 
+    }
+
+    private class HacTimer implements FutureCallback<HttpResponse> {
+        private final FutureCallback<HttpResponse> delegate;
+        private final long start = System.currentTimeMillis();
+
+        public HacTimer(FutureCallback<HttpResponse> delegate) {
+            this.delegate = delegate;
+        }
+
+        public void completed(HttpResponse result) {
+            StatusLine statusLine = result.getStatusLine();
+            String ms = join(" ", (System.currentTimeMillis() - start),
+                    "ms",
+                    internalHttpRequest.getRequestLine(),
+                    statusLine.getStatusCode(),
+                    statusLine.getReasonPhrase());
+            LOGGER.debug(ms);
+            delegate.completed(result);
+        }
+
+        public void failed(Exception ex) {
+            String ms = join(" ", (System.currentTimeMillis() - start),
+                    "ms",
+                    internalHttpRequest.getRequestLine(),
+                    ex.getMessage());
+            LOGGER.debug(ms);
+            delegate.failed(ex);
+        }
+
+        public void cancelled() {
+
+            String ms = join(" ", "cancelled",
+                    (System.currentTimeMillis() - start),
+                    "ms",
+                    internalHttpRequest.getRequestLine());
+            LOGGER.debug(ms);
+            delegate.cancelled();
+        }
+
+        private String join(String sp, Object... data) {
+            StringBuilder sb = new StringBuilder();
+            for (Object datum : data) {
+                sb
+                        .append(String.valueOf(datum))
+                        .append(sp);
+            }
+            return sb.toString();
+        }
     }
 }

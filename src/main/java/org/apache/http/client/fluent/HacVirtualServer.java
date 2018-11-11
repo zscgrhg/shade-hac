@@ -1,5 +1,7 @@
 package org.apache.http.client.fluent;
 
+import org.slf4j.Logger;
+
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.ConnectException;
@@ -47,6 +49,7 @@ public class HacVirtualServer {
 
 
     public class ServerFailedListener extends HacListener implements HacSyncListener {
+        final Logger LOGGER = HacLoggerBuddy.of(ServerFailedListener.class);
         private final HacRealServer watched;
 
         public ServerFailedListener(HacRealServer watched) {
@@ -58,6 +61,7 @@ public class HacVirtualServer {
             if (ex instanceof ConnectException
                     || ex instanceof UnknownHostException) {
                 remove(watched);
+                LOGGER.debug(" remove failed server: " + watched.getBasePath());
             }
         }
     }
@@ -84,12 +88,9 @@ public class HacVirtualServer {
             return this;
         }
 
-        private URI expand() {
-            List<HacRealServer> copy = realRealServers;
-            if (copy == null || copy.isEmpty()) {
-                throw new RuntimeException("server of " + name + " is down");
-            }
-            HacRealServer realServer = loadBlancer.select(copy);
+        private URI expand(HacRealServer realServer) {
+
+
             StringBuilder sb = new StringBuilder(realServer.getBasePath()).append(path);
             char c = '?';
             for (Map.Entry<String, String> entry : queryParams.entrySet()) {
@@ -114,12 +115,27 @@ public class HacVirtualServer {
             }
         }
 
+        private HacRealServer select() {
+            List<HacRealServer> copy = realRealServers;
+            if (copy == null || copy.isEmpty()) {
+                throw new RuntimeException("server of " + name + " is down");
+            }
+            HacRealServer realServer = loadBlancer.select(copy);
+            return realServer;
+        }
+
         public HacRequest Get() {
-            return HacRequest.Get(hacExecutor, expand());
+            HacRealServer select = select();
+            return HacRequest
+                    .Get(hacExecutor, expand(select))
+                    .addListener(new ServerFailedListener(select));
         }
 
         public HacRequest Post() {
-            return HacRequest.Post(hacExecutor, expand());
+            HacRealServer select = select();
+            return HacRequest
+                    .Post(hacExecutor, expand(select))
+                    .addListener(new ServerFailedListener(select));
         }
     }
 
