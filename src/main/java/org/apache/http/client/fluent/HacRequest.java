@@ -14,6 +14,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import static org.apache.http.client.fluent.HacStringBuddy.join;
+
 public class HacRequest extends Request {
     final static Logger LOGGER = HacLoggerBuddy.of(HacRequest.class);
     private final InternalHttpRequest internalHttpRequest;
@@ -45,7 +47,7 @@ public class HacRequest extends Request {
 
     public Future<HttpResponse> aexec() {
         Future<HttpResponse> execute = hacExecutor
-                .execute(internalHttpRequest, new HacTimer(chain));
+                .execute(internalHttpRequest, new HacTracer(chain));
         return execute;
     }
 
@@ -277,14 +279,14 @@ public class HacRequest extends Request {
         }
 
         @Override
-        public void completed(final HttpResponse result) {
+        public void completed(final HttpResponse response) {
             for (FutureCallback<HttpResponse> hcListener : syncTasks) {
-                hcListener.completed(result);
+                hcListener.completed(response);
             }
             for (final FutureCallback<HttpResponse> hcListener : asyncTasks) {
                 hacExecutor.execute(new Runnable() {
                     public void run() {
-                        hcListener.completed(result);
+                        hcListener.completed(response);
                     }
                 });
             }
@@ -321,17 +323,17 @@ public class HacRequest extends Request {
 
     }
 
-    private class HacTimer implements FutureCallback<HttpResponse> {
+    private class HacTracer implements FutureCallback<HttpResponse> {
         private final FutureCallback<HttpResponse> delegate;
         private final long start = System.currentTimeMillis();
 
-        public HacTimer(FutureCallback<HttpResponse> delegate) {
+        public HacTracer(FutureCallback<HttpResponse> delegate) {
             this.delegate = delegate;
         }
 
-        public void completed(HttpResponse result) {
+        public void completed(HttpResponse response) {
             if (LOGGER.isDebugEnabled()) {
-                StatusLine statusLine = result.getStatusLine();
+                StatusLine statusLine = response.getStatusLine();
                 String ms = join(" ", (System.currentTimeMillis() - start),
                         "ms",
                         internalHttpRequest.getRequestLine(),
@@ -339,7 +341,7 @@ public class HacRequest extends Request {
                         statusLine.getReasonPhrase());
                 LOGGER.debug(ms);
             }
-            delegate.completed(result);
+            delegate.completed(response);
         }
 
         public void failed(Exception ex) {
@@ -365,14 +367,6 @@ public class HacRequest extends Request {
             delegate.cancelled();
         }
 
-        private String join(String sp, Object... data) {
-            StringBuilder sb = new StringBuilder();
-            for (Object datum : data) {
-                sb
-                        .append(String.valueOf(datum))
-                        .append(sp);
-            }
-            return sb.toString();
-        }
+
     }
 }

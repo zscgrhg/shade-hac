@@ -1,13 +1,16 @@
 package org.apache.http.client.fluent;
 
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 @EqualsAndHashCode(of = {"host", "port"})
+@ToString
 public class HacRealServer {
     public static final AtomicLong COUNTER = new AtomicLong(0);
     private final long mark = COUNTER.incrementAndGet();
+    private final String schema;
     private final String host;
     private final int port;
     private final String ctxPath;
@@ -22,18 +25,19 @@ public class HacRealServer {
         this.ctxPath = ctxPath;
         this.healthEndpoint = healthEndpoint;
         this.enableSSL = enableSSL;
+        if (enableSSL) {
+            this.schema = "https://";
+        } else {
+            this.schema = "http://";
+        }
     }
 
     public String resolve(String path) {
-
-        return "http://" + host + ":" + port + "/" + trimSlash(ctxPath + "/" + path);
+        return schema + address + "/" + HacStringBuddy.trimBeginSlash(ctxPath + "/" + path);
     }
 
     public String getAddress() {
         return address;
     }
 
-    private String trimSlash(String path) {
-        return path.replace("^/+", "");
-    }
 }

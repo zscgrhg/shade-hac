@@ -5,6 +5,8 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import org.slf4j.Logger;
 
+import static org.apache.http.client.fluent.HacStringBuddy.trim;
+
 class HacLoggerBuddy {
     public static final LoggerContext LOGGER_CONTEXT = createFromClasspathResource();
     public static final String CONFIG_NAME = "hac.xml";
@@ -39,11 +41,5 @@ class HacLoggerBuddy {
         }
     }
 
-    private static String trim(String str) {
-        if (str != null) {
-            return str.trim();
-        } else {
-            return null;
-        }
-    }
+
 }

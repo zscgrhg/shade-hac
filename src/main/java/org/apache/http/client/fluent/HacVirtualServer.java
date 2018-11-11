@@ -42,8 +42,10 @@ public class HacVirtualServer {
 
     public synchronized void remove(HacRealServer realServer) {
         List<HacRealServer> copy = new ArrayList<HacRealServer>(realRealServers);
-        copy.remove(realServer);
-        this.realRealServers = copy;
+        boolean remove = copy.remove(realServer);
+        if (remove) {
+            this.realRealServers = copy;
+        }
     }
 
 
