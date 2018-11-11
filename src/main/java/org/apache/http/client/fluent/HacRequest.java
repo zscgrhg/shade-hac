@@ -330,32 +330,38 @@ public class HacRequest extends Request {
         }
 
         public void completed(HttpResponse result) {
-            StatusLine statusLine = result.getStatusLine();
-            String ms = join(" ", (System.currentTimeMillis() - start),
-                    "ms",
-                    internalHttpRequest.getRequestLine(),
-                    statusLine.getStatusCode(),
-                    statusLine.getReasonPhrase());
-            LOGGER.debug(ms);
+            if (LOGGER.isDebugEnabled()) {
+                StatusLine statusLine = result.getStatusLine();
+                String ms = join(" ", (System.currentTimeMillis() - start),
+                        "ms",
+                        internalHttpRequest.getRequestLine(),
+                        statusLine.getStatusCode(),
+                        statusLine.getReasonPhrase());
+                LOGGER.debug(ms);
+            }
             delegate.completed(result);
         }
 
         public void failed(Exception ex) {
-            String ms = join(" ", (System.currentTimeMillis() - start),
-                    "ms",
-                    internalHttpRequest.getRequestLine(),
-                    ex.getMessage());
-            LOGGER.debug(ms);
+            if (LOGGER.isDebugEnabled()) {
+                String ms = join(" ", (System.currentTimeMillis() - start),
+                        "ms",
+                        internalHttpRequest.getRequestLine(),
+                        ex.getMessage());
+                LOGGER.debug(ms);
+            }
             delegate.failed(ex);
         }
 
         public void cancelled() {
 
-            String ms = join(" ", "cancelled",
-                    (System.currentTimeMillis() - start),
-                    "ms",
-                    internalHttpRequest.getRequestLine());
-            LOGGER.debug(ms);
+            if (LOGGER.isDebugEnabled()) {
+                String ms = join(" ", "cancelled",
+                        (System.currentTimeMillis() - start),
+                        "ms",
+                        internalHttpRequest.getRequestLine());
+                LOGGER.debug(ms);
+            }
             delegate.cancelled();
         }
 
